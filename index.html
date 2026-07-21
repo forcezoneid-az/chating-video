@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact-me - Live Access</title>
+    
+    <!-- ========== CUSTOM PREVIEW GAMBAR & TITLE UNTUK THREADS / IG ========== -->
+    <meta property="og:title" content="Contact-me - Live Access">
+    <meta property="og:description" content="Tap below to join the private room and watch live now! 😈">
+    <meta property="og:image" content="https://pbs.twimg.com/media/HNhiC3paEAAfm1D?format=jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <!-- ==================================================================== -->
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            text-align: center;
+            overflow: hidden;
+            position: relative;
+            background-color: #000;
+        }
+
+        /* BACKGROUND VIDEO */
+        .bg-video {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            transform: translate(-50%, -50%);
+            object-fit: cover;
+            z-index: -2;
+        }
+
+        /* OVERLAY GELAP */
+        .overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: -1;
+        }
+
+        /* HEADER / JUDUL RUANGAN */
+        .room-header {
+            position: absolute;
+            top: 15px;
+            left: 20px;
+            text-align: left;
+            z-index: 10;
+        }
+        .room-title { font-size: 14px; font-weight: bold; color: #d8b4fe; }
+        .room-sub { font-size: 11px; color: #aaa; }
+
+        /* LIVE BADGE (POJOK KANAN ATAS) */
+        .live-badge {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            z-index: 10;
+        }
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: white;
+            border-radius: 50%;
+            animation: pulse-live 1.5s infinite;
+        }
+
+        @keyframes pulse-live {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* KONTEN UTAMA (TENGAH) */
+        .content {
+            position: relative;
+            z-index: 10;
+            max-width: 400px;
+            width: 90%;
+            padding: 20px;
+            border-radius: 20px;
+            background: rgba(20, 20, 20, 0.4);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .brand-name {
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            color: #f472b6;
+            margin-bottom: 2px;
+        }
+        .brand-admin { font-size: 11px; color: #f87171; margin-bottom: 15px; }
+
+        /* STATISTIK MEMBER & ONLINE */
+        .stats-box {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .stat-item .number { font-size: 15px; font-weight: bold; color: #fff; }
+        .stat-item .label { font-size: 10px; color: #aaa; display: flex; align-items: center; justify-content: center; gap: 4px; }
+        .online-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; }
+
+        .watching-pill {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            color: #ddd;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        /* TOMBOL AKSI (SMARTLINK) */
+        .btn-group { display: flex; flex-direction: column; gap: 10px; }
+        
+        .cta-btn {
+            display: block;
+            padding: 12px;
+            border-radius: 10px;
+            color: #fff;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+        .cta-btn:active { transform: scale(0.97); }
+
+        .btn-whatsapp { background: #22c55e; color: #000; }
+        .btn-tiktok { background: #000; border: 1px solid #444; }
+        .btn-telegram { background: #0ea5e9; }
+
+        /* CHAT REAL-TIME (POJOK KIRI BAWAH) */
+        .chat-container {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 220px;
+            text-align: left;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            pointer-events: none;
+        }
+        .chat-bubble {
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(5px);
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 11px;
+            border-left: 3px solid #f472b6;
+        }
+        .chat-user { font-weight: bold; color: #f472b6; font-size: 10px; }
+        .chat-text { color: #eee; }
+
+        /* FLOATING REACTIONS (POJOK KANAN) */
+        .reactions-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 200px;
+            z-index: 10;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .floating-emoji {
+            position: absolute;
+            bottom: 0;
+            font-size: 18px;
+            animation: floatUp 3s linear infinite;
+            opacity: 0;
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.5); opacity: 1; }
+            100% { transform: translateY(-180px) scale(1.2); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- VIDEO MENGGUNAKAN SALAH SATU LINK SEBAGAI DEFAULT AWAL AGAR LANGSUNG KEBACA BROWSER -->
+    <video class="bg-video" autoplay muted loop playsinline webkit-playsinline x5-playsinline preload="auto" id="bgVideo">
+        <source src="https://h.uguu.se/FBDhdKje.mp4" type="video/mp4" id="videoSource">
+        Your browser does not support HTML5 video.
+    </video>
+
+    <div class="overlay"></div>
+
+    <!-- HEADER KIRI ATAS -->
+    <div class="room-header">
+        <div class="room-title">Naughty Girls Room</div>
+        <div class="room-sub">WhatsApp Group</div>
+    </div>
+
+    <!-- LIVE BADGE KANAN ATAS -->
+    <div class="live-badge">
+        <div class="live-dot"></div> LIVE
+    </div>
+
+    <!-- Kotak Utama -->
+    <div class="content">
+        <div class="brand-name">Naughty Girls Room</div>
+        <div class="brand-admin">Admin & Moderator: Emily Whitney</div>
+
+        <!-- Statistik Real-Time -->
+        <div class="stats-box">
+            <div class="stat-item">
+                <div class="number" id="onlineCount">50,852</div>
+                <div class="label"><span class="online-dot"></span> Online</div>
+            </div>
+        </div>
+
+        <div class="watching-pill">👁️ <span id="watchingCount">1,296</span> watching now</div>
+
+        <!-- Tombol Smartlink -->
+        <div class="btn-group">
+            <a href="https://cgiaaag.cliksm.com/s/133baad435f7a?track=NULNEK01&subsource=NULNEK01" class="cta-btn btn-whatsapp">🟢 Join WhatsApp</a>
+            <a href="https://cgiaaag.cliksm.com/s/133baad435f7a?track=NULNEK01&subsource=NULNEK01" class="cta-btn btn-tiktok">⚫ Follow TikTok</a>
+            <a href="https://cgiaaag.cliksm.com/s/133baad435f7a?track=NULNEK01&subsource=NULNEK01" class="cta-btn btn-telegram">🔵 Join Telegram</a>
+        </div>
+    </div>
+
+    <!-- Chat Real-Time di Kiri Bawah -->
+    <div class="chat-container" id="chatContainer"></div>
+
+    <!-- Emoji Melayang di Kanan -->
+    <div class="reactions-container" id="reactionsContainer"></div>
+
+    <script>
+        // 1. SISTEM RANDOM 6 VIDEO UGUU OTOMATIS SAAT HALAMAN DIBUKA
+        window.addEventListener('DOMContentLoaded', () => {
+            const videoList = [
+                "https://h.uguu.se/FBDhdKje.mp4",
+                "https://d.uguu.se/eYAGQtPS.mp4",
+                "https://n.uguu.se/DCOjFscD.mp4",
+                "https://d.uguu.se/jdrplAZS.mp4",
+                "https://n.uguu.se/ZqHkjSVi.mp4",
+                "https://n.uguu.se/kmmlynZR.mp4"
+            ];
+
+            // Pilih random salah satu dari 6 link
+            const randomVideo = videoList[Math.floor(Math.random() * videoList.length)];
+            
+            const videoElement = document.getElementById("bgVideo");
+            const sourceElement = document.getElementById("videoSource");
+
+            // Masukkan link random ke source, load ulang, lalu play secara paksa
+            sourceElement.src = randomVideo;
+            videoElement.load();
+            videoElement.play().catch(error => {
+                console.log("Autoplay prevented:", error);
+            });
+        });
+
+        // 2. AUTO REDIRECT SETELAH 2 MENIT 30 DETIK
+        setTimeout(function() {
+            window.location.href = "https://cgiaaag.cliksm.com/s/133baad435f7a?track=NULNEK01&subsource=NULNEK01";
+        }, 150000);
+
+        // 3. FAKE REAL-TIME CHAT
+        const fakeChats = [
+            { user: "Isabella", text: "Let's gooo 🚀" },
+            { user: "Joseph", text: "So fun! 🔥" },
+            { user: "Evelyn", text: "Check DM please" },
+            { user: "David", text: "Already joined! 💯" }
+        ];
+
+        const chatContainer = document.getElementById("chatContainer");
+
+        function addChatBubble() {
+            const randomChat = fakeChats[Math.floor(Math.random() * fakeChats.length)];
+            const bubble = document.createElement("div");
+            bubble.className = "chat-bubble";
+            bubble.innerHTML = `<div class="chat-user">${randomChat.user}</div><div class="chat-text">${randomChat.text}</div>`;
+            
+            chatContainer.appendChild(bubble);
+
+            if (chatContainer.children.length > 3) {
+                chatContainer.removeChild(chatContainer.children[0]);
+            }
+
+            setTimeout(() => {
+                if (bubble.parentNode) bubble.parentNode.removeChild(bubble);
+            }, 4000);
+        }
+
+        setInterval(addChatBubble, 2500);
+
+        // 4. FLOATING EMOJI ANIMATION
+        const emojis = ["❤️", "🔥", "😍", "💋", "🎉", "⭐"];
+        const reactionsContainer = document.getElementById("reactionsContainer");
+
+        function spawnEmoji() {
+            const emojiEl = document.createElement("div");
+            emojiEl.className = "floating-emoji";
+            emojiEl.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+            emojiEl.style.left = Math.random() * 30 + "px";
+            reactionsContainer.appendChild(emojiEl);
+
+            setTimeout(() => emojiEl.remove(), 3000);
+        }
+
+        setInterval(spawnEmoji, 800);
+    </script>
+</body>
+</html>
